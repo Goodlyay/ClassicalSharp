@@ -75,27 +75,27 @@ namespace ClassicalSharp.Map {
 				//if the current block is not a light blocker AND the current spot is less than i
 				if( !info.BlocksLight[curBlock] && skyLight >= pass ) {
 					//check the six neighbors sky light value,
-					if( y+1 < maxY && skyLight > (volumeArray[x, y+1, z] >> 4) ) {
+					if( y < maxY && skyLight > (volumeArray[x, y+1, z] >> 4) ) {
 						volumeArray[x, y+1, z] &= 0x0F; // reset skylight bits to 0
 						volumeArray[x, y+1, z] |= (byte)((skyLight - 1) << 4); // set skylight bits
 					}
-					if( y-1 >= 0 && skyLight > (volumeArray[x, y-1, z] >> 4) ) {
+					if( y > 0 && skyLight > (volumeArray[x, y-1, z] >> 4) ) {
 						volumeArray[x, y-1, z] &= 0x0F;
 						volumeArray[x, y-1, z] |= (byte)((skyLight - 1) << 4);
 					}
-					if( x+1 < maxX && skyLight > (volumeArray[x+1, y, z] >> 4) ) {
+					if( x < maxX && skyLight > (volumeArray[x+1, y, z] >> 4) ) {
 						volumeArray[x+1, y, z] &= 0x0F;
 						volumeArray[x+1, y, z] |= (byte)((skyLight - 1) << 4);
 					}
-					if( x-1 >= 0 && skyLight > (volumeArray[x-1, y, z] >> 4) ) {
+					if( x > 0 && skyLight > (volumeArray[x-1, y, z] >> 4) ) {
 						volumeArray[x-1, y, z] &= 0x0F;
 						volumeArray[x-1, y, z] |= (byte)((skyLight - 1) << 4);
 					}
-					if( z+1 < maxZ && skyLight > (volumeArray[x, y, z+1] >> 4) ) {
+					if( z < maxZ && skyLight > (volumeArray[x, y, z+1] >> 4) ) {
 						volumeArray[x, y, z+1] &= 0x0F;
 						volumeArray[x, y, z+1] |= (byte)((skyLight - 1) << 4);
 					}
-					if( z-1 >= 0 && skyLight > (volumeArray[x, y, z-1] >> 4) ) {
+					if( z > 0 && skyLight > (volumeArray[x, y, z-1] >> 4) ) {
 						volumeArray[x, y, z-1] &= 0x0F;
 						volumeArray[x, y, z-1] |= (byte)((skyLight - 1) << 4);
 					}
@@ -105,27 +105,27 @@ namespace ClassicalSharp.Map {
 				//if the current block is not a light blocker AND the current spot is less than i
 				if( !info.BlocksLight[curBlock] && blockLight >= pass ) {
 					//check the six neighbors sky light value,
-					if( y+1 < maxY && blockLight > (volumeArray[x, y+1, z] & 0x0F) ) {
+					if( y < maxY && blockLight > (volumeArray[x, y+1, z] & 0x0F) ) {
 						volumeArray[x, y+1, z] &= 0xF0; // reset blocklight bits to 0
 						volumeArray[x, y+1, z] |= (byte)(blockLight - 1); // set blocklight bits
 					}
-					if( y-1 >= 0 && blockLight > (volumeArray[x, y-1, z] & 0x0F) ) {
+					if( y > 0 && blockLight > (volumeArray[x, y-1, z] & 0x0F) ) {
 						volumeArray[x, y-1, z] &= 0xF0;
 						volumeArray[x, y-1, z] |= (byte)(blockLight - 1);
 					}
-					if( x+1 < maxX && blockLight > (volumeArray[x+1, y, z] & 0x0F) ) {
+					if( x < maxX && blockLight > (volumeArray[x+1, y, z] & 0x0F) ) {
 						volumeArray[x+1, y, z] &= 0xF0;
 						volumeArray[x+1, y, z] |= (byte)(blockLight - 1);
 					}
-					if( x-1 >= 0 && blockLight > (volumeArray[x-1, y, z] & 0x0F) ) {
+					if( x > 0 && blockLight > (volumeArray[x-1, y, z] & 0x0F) ) {
 						volumeArray[x-1, y, z] &= 0xF0;
 						volumeArray[x-1, y, z] |= (byte)(blockLight - 1);
 					}
-					if( z+1 < maxZ && blockLight > (volumeArray[x, y, z+1] & 0x0F) ) {
+					if( z < maxZ && blockLight > (volumeArray[x, y, z+1] & 0x0F) ) {
 						volumeArray[x, y, z+1] &= 0xF0;
 						volumeArray[x, y, z+1] |= (byte)(blockLight - 1);
 					}
-					if( z-1 >= 0 && blockLight > (volumeArray[x, y, z-1] & 0x0F) ) {
+					if( z > 0 && blockLight > (volumeArray[x, y, z-1] & 0x0F) ) {
 						volumeArray[x, y, z-1] &= 0xF0;
 						volumeArray[x, y, z-1] |= (byte)(blockLight - 1);
 					}
