@@ -13,7 +13,6 @@ namespace ClassicalSharp.Map {
 		int width, length, height, sidesLevel, edgeLevel;
 		const byte lightmapSize = 8;
 		const byte lightValueMax = (byte)(lightmapSize -1);
-		protected byte curBlock;
 		protected int maxX, maxY, maxZ;
 		public static byte[, ,] volumeArray;
 		
@@ -24,7 +23,7 @@ namespace ClassicalSharp.Map {
 			//game.Events.TerrainAtlasChanged += TerrainAtlasChanged;
 		}
 		
-		public void OnNewMapLoaded( object sender, EventArgs e ) {			
+		public void OnNewMapLoaded( object sender, EventArgs e ) {
 			map = game.World;
 			width = map.Width; height = map.Height; length = map.Length;
 			maxX = width - 1; maxY = height - 1; maxZ = length - 1;
@@ -44,15 +43,18 @@ namespace ClassicalSharp.Map {
 		}
 
 		void CastInitial() {
-			for( int z = maxZ; z >= 0; z-- ) {
-				for( int x = maxX; x >= 0; x-- ) {
+			int offset = 0, oneY = width * length;
+			for( int z = 0; z < length; z++ ) {
+				for( int x = 0; x < width; x++ ) {
+					int index = (maxY * oneY) + offset;
+					offset++; // increase horizontal position
+					
 					for( int y = maxY; y >= 0; y-- ) {
-						int safeY = y -1;
-						if( safeY < 0 ) { safeY = 0; }
-						curBlock = map.GetBlock(x, safeY, z);
+						byte curBlock = map.blocks[index];
+						index -= oneY; // reduce y position
 						
 						//if the current block is in sunlight assign the fullest sky brightness to the higher 4 bits
-						if( map.IsLit(x, safeY, z) ) { volumeArray[x, y, z] = (byte)(lightValueMax << 4); }
+						if( (y - 1) > map.GetLightHeight(x, z) ) { volumeArray[x, y, z] = (byte)(lightValueMax << 4); }
 						//if the current block is fullbright assign the fullest block brightness to the higher 4 bits
 						if( info.FullBright[curBlock] ) { volumeArray[x, y, z] |= lightValueMax; }
 					}
@@ -61,82 +63,83 @@ namespace ClassicalSharp.Map {
 		}
 		
 		void DoPass( int i ) {
-			for( int z = maxZ; z >= 0; z-- ) {
-				for( int x = maxX; x >= 0; x-- ) {
+			int offset = 0, oneY = width * length;
+			for( int z = 0; z < length; z++ ) {
+				for( int x = 0; x < width; x++ ) {
+					int index = (maxY * oneY) + offset;
+					offset++; // increase horizontal position
+					
 					for( int y = maxY; y >= 0; y-- ) {
-						curBlock = map.GetBlock(x, y, z);
-						//your pc: kill me
+						byte curBlock = map.blocks[index];
+						index -= oneY; // reduce y position
 						
-						byte tempSkyLevelPrev = 0;
-						byte tempSkyLevel = (byte)(volumeArray[x, y, z] >> 4);
-						
+						byte maxSkyLight = 0, skyLight = (byte)(volumeArray[x, y, z] >> 4);
 						//if the current block is not a light blocker AND the current spot is less than i
-						if( !info.BlocksLight[curBlock] && tempSkyLevel < i ) {
+						if( !info.BlocksLight[curBlock] && skyLight < i ) {
 							//check the six neighbors sky light value,
-							if( y+1 < maxY && tempSkyLevelPrev < (volumeArray[x, y+1, z] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x, y+1, z] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( y+1 < maxY && maxSkyLight < (volumeArray[x, y+1, z] >> 4) ) {
+								skyLight = (byte)(volumeArray[x, y+1, z] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( y-1 >= 0 && tempSkyLevelPrev < (volumeArray[x, y-1, z] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x, y-1, z] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( y-1 >= 0 && maxSkyLight < (volumeArray[x, y-1, z] >> 4) ) {
+								skyLight = (byte)(volumeArray[x, y-1, z] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( x+1 < maxX && tempSkyLevelPrev < (volumeArray[x+1, y, z] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x+1, y, z] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( x+1 < maxX && maxSkyLight < (volumeArray[x+1, y, z] >> 4) ) {
+								skyLight = (byte)(volumeArray[x+1, y, z] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( x-1 >= 0 && tempSkyLevelPrev < (volumeArray[x-1, y, z] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x-1, y, z] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( x-1 >= 0 && maxSkyLight < (volumeArray[x-1, y, z] >> 4) ) {
+								skyLight = (byte)(volumeArray[x-1, y, z] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( z+1 < maxZ && tempSkyLevelPrev < (volumeArray[x, y, z+1] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x, y, z+1] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( z+1 < maxZ && maxSkyLight < (volumeArray[x, y, z+1] >> 4) ) {
+								skyLight = (byte)(volumeArray[x, y, z+1] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( z-1 >= 0 && tempSkyLevelPrev < (volumeArray[x, y, z-1] >> 4) ) {
-								tempSkyLevel = (byte)(volumeArray[x, y, z-1] >> 4);
-								tempSkyLevelPrev = tempSkyLevel;
+							if( z-1 >= 0 && maxSkyLight < (volumeArray[x, y, z-1] >> 4) ) {
+								skyLight = (byte)(volumeArray[x, y, z-1] >> 4);
+								maxSkyLight = skyLight;
 							}
-							if( tempSkyLevel > 0 ) {
-								tempSkyLevel--;
+							if( skyLight > 0 ) {
+								skyLight--;
 							}
 						}
 						
-						byte tempBlockLevelPrev = 0;
-						byte tempBlockLevel = (byte)(volumeArray[x, y, z] & 0x0F);
+						byte maxBlockLight = 0, blockLight = (byte)(volumeArray[x, y, z] & 0x0F);
 						//if the current block is not a light blocker AND the current spot is less than i
-						if( !info.BlocksLight[curBlock] && tempBlockLevel < i ) {
+						if( !info.BlocksLight[curBlock] && blockLight < i ) {
 							//check the six neighbors sky light value,
-							if( y+1 < maxY && tempBlockLevelPrev < (volumeArray[x, y+1, z] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x, y+1, z] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( y+1 < maxY && maxBlockLight < (volumeArray[x, y+1, z] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x, y+1, z] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( y-1 >= 0 && tempBlockLevelPrev < (volumeArray[x, y-1, z] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x, y-1, z] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( y-1 >= 0 && maxBlockLight < (volumeArray[x, y-1, z] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x, y-1, z] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( x+1 < maxX && tempBlockLevelPrev < (volumeArray[x+1, y, z] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x+1, y, z] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( x+1 < maxX && maxBlockLight < (volumeArray[x+1, y, z] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x+1, y, z] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( x-1 >= 0 && tempBlockLevelPrev < (volumeArray[x-1, y, z] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x-1, y, z] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( x-1 >= 0 && maxBlockLight < (volumeArray[x-1, y, z] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x-1, y, z] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( z+1 < maxZ && tempBlockLevelPrev < (volumeArray[x, y, z+1] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x, y, z+1] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( z+1 < maxZ && maxBlockLight < (volumeArray[x, y, z+1] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x, y, z+1] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( z-1 >= 0 && tempBlockLevelPrev < (volumeArray[x, y, z-1] & 0x0F) ) {
-								tempBlockLevel = (byte)(volumeArray[x, y, z-1] & 0x0F);
-								tempBlockLevelPrev = tempBlockLevel;
+							if( z-1 >= 0 && maxBlockLight < (volumeArray[x, y, z-1] & 0x0F) ) {
+								blockLight = (byte)(volumeArray[x, y, z-1] & 0x0F);
+								maxBlockLight = blockLight;
 							}
-							if( tempBlockLevel > 0 ) {
-								tempBlockLevel--;
+							if( blockLight > 0 ) {
+								blockLight--;
 							}
 						}
 						
-						volumeArray[x, y, z] = (byte)((tempSkyLevel << 4) | (tempBlockLevel) );
+						volumeArray[x, y, z] = (byte)((skyLight << 4) | (blockLight) );
 						//set the volumeArray's lower 4 bits to the value one less than the brightest neighbors block light value
 						
 					}
