@@ -298,7 +298,7 @@ namespace ClassicalSharp {
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
 			//int col = fullBright ? FastColour.WhitePacked : ((Y - offset) >= map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
 			
-			int col = FastColour.c1;
+			int col = FastColour.c0;
 			int safeY = Y +offset;
 			if( safeY >= height ) {
 				safeY = height-1;

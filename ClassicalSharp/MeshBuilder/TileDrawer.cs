@@ -184,8 +184,7 @@ namespace ClassicalSharp {
 			DrawInfo part = normalParts[i];
 			//int col = fullBright ? FastColour.WhitePacked : (Y > map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
 			
-			int col = FastColour.c1;
-			
+			int col = FastColour.c0;			
 			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 1 ) {  col = FastColour.c1; }
 			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 2 ) {  col = FastColour.c2; }
 			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 3 ) {  col = FastColour.c3; }
