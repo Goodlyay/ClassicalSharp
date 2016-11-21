@@ -35,9 +35,6 @@ namespace ClassicalSharp.Renderers {
 			Console.WriteLine("about to do light volume");
 			lightVolume = new LightVolume();
 			lightVolume.Init( game );
-			game.WorldEvents.OnNewMapLoaded += lightVolume.OnNewMapLoaded;
-			
-			
 			
 			game.Events.TerrainAtlasChanged += TerrainAtlasChanged;
 			game.WorldEvents.OnNewMap += OnNewMap;

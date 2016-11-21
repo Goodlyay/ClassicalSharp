@@ -89,17 +89,11 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( X - offset < 0 ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmapXSide[7, 7];
 			} else {
-				col = GetLight(X - offset, Y, Z);
+				int light = LightVolume.lightLevels[X - offset, Y, Z];
+				col = LightVolume.lightmapXSide[light >> 4, light & 0xF];
 			}
-			
-			FastColour colNice = new FastColour( col );
-			int colXSide;
-			int colZSide;
-			int colYBottom;
-			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
-			col = colXSide;
 			
 			part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z2 + (count - 1), u2, v1, col );
 			part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col );
@@ -123,17 +117,11 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( X + offset >= width ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmapXSide[7, 7];
 			} else {
-				col = GetLight(X + offset, Y, Z);
+				int light = LightVolume.lightLevels[X + offset, Y, Z];
+				col = LightVolume.lightmapXSide[light >> 4, light & 0xF];
 			}
-			
-			FastColour colNice = new FastColour( col );
-			int colXSide;
-			int colZSide;
-			int colYBottom;
-			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
-			col = colXSide;
 			
 			part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col );
 			part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z2 + (count - 1), u2, v1, col );
@@ -156,17 +144,11 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( Z - offset < 0 ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmapZSide[7, 7];
 			} else {
-				col = GetLight(X, Y, Z - offset);
+				int light = LightVolume.lightLevels[X, Y, Z - offset];
+				col = LightVolume.lightmapZSide[light >> 4, light & 0xF];
 			}
-			
-			FastColour colNice = new FastColour( col );
-			int colXSide;
-			int colZSide;
-			int colYBottom;
-			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
-			col = colZSide;
 			
 			part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v2, col );
 			part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col );
@@ -189,17 +171,11 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( Z + offset >= length ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmapZSide[7, 7];
 			} else {
-				col = GetLight(X, Y, Z + offset);
+				int light = LightVolume.lightLevels[X, Y, Z + offset];
+				col = LightVolume.lightmapZSide[light >> 4, light & 0xF];
 			}
-			
-			FastColour colNice = new FastColour( col );
-			int colXSide;
-			int colZSide;
-			int colYBottom;
-			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
-			col = colZSide;
 			
 			part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col );
 			part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v1, col );
@@ -221,17 +197,11 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( Y - offset < 0 ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmapYBottom[7, 7];
 			} else {
-				col = GetLight(X, Y - offset, Z);
+				int light = LightVolume.lightLevels[X, Y - offset, Z];
+				col = LightVolume.lightmapYBottom[light >> 4, light & 0xF];
 			}
-			
-			FastColour colNice = new FastColour( col );
-			int colXSide;
-			int colZSide;
-			int colYBottom;
-			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
-			col = colYBottom;
 			
 			part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col );
 			part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col );
@@ -253,30 +223,16 @@ namespace ClassicalSharp {
 			
 			int col;
 			if( Y + offset >= height ) {
-				col = FastColour.c7;
+				col = LightVolume.lightmap[7, 7];
 			} else {
-				col = GetLight(X, Y + offset, Z);
+				int light = LightVolume.lightLevels[X, Y + offset, Z];
+				col = LightVolume.lightmap[light >> 4, light & 0xF];
 			}
 			
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col );
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col );
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v2, col );
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v2, col );
-		}
-		
-		int GetLight(int x, int y, int z) {
-			int light = LightVolume.volumeArray[x, y, z];
-			light = Math.Max(light & 0xF, light >> 4);
-			switch (light) {
-				case 1: return FastColour.c1;
-				case 2: return FastColour.c2;
-				case 3: return FastColour.c3;
-				case 4: return FastColour.c4;
-				case 5: return FastColour.c5;
-				case 6: return FastColour.c6;
-				case 7: return FastColour.c7;	
-				default: return FastColour.c0;
-			}
 		}
 	}
 }
