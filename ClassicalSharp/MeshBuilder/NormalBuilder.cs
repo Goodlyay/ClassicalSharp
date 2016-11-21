@@ -11,6 +11,7 @@ namespace ClassicalSharp {
 		protected override int StretchXLiquid( int xx, int countIndex, int x, int y, int z, int chunkIndex, byte block ) {
 			if( OccludedLiquid( chunkIndex ) ) return 0;
 			int count = 1;
+			return count;
 			x++;
 			chunkIndex++;
 			countIndex += Side.Sides;
@@ -29,6 +30,7 @@ namespace ClassicalSharp {
 		
 		protected override int StretchX( int xx, int countIndex, int x, int y, int z, int chunkIndex, byte block, int face ) {
 			int count = 1;
+			return count;
 			x++;
 			chunkIndex++;
 			countIndex += Side.Sides;
@@ -47,6 +49,7 @@ namespace ClassicalSharp {
 		
 		protected override int StretchZ( int zz, int countIndex, int x, int y, int z, int chunkIndex, byte block, int face ) {
 			int count = 1;
+			return count;
 			z++;
 			chunkIndex += extChunkSize;
 			countIndex += chunkSize * Side.Sides;
@@ -81,8 +84,31 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + maxBB.Y * invVerElementSize;
 			float v2 = vOrigin + minBB.Y * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked :
-				X >= offset ? (Y > map.heightmap[(Z * width) + (X - offset)] ? env.SunXSide : env.ShadowXSide) : env.SunXSide;
+			//int col = fullBright ? FastColour.WhitePacked :
+			//	X >= offset ? (Y > map.heightmap[(Z * width) + (X - offset)] ? env.SunXSide : env.ShadowXSide) : env.SunXSide;
+			
+			int col = FastColour.c0;
+			int safeX = X -offset;
+			if( safeX < 0 ) {
+				safeX = 0;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X -offset, Y, Z] >> 4) == 7 ) {  col = FastColour.c7; }				
+			}
+			
+			FastColour colNice = new FastColour( col );
+			int colXSide;
+			int colZSide;
+			int colYBottom;
+			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
+			col = colXSide;
 			
 			part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z2 + (count - 1), u2, v1, col );
 			part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col );
@@ -100,8 +126,32 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + maxBB.Y * invVerElementSize;
 			float v2 = vOrigin + minBB.Y * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked :
-				X <= (maxX - offset) ? (Y > map.heightmap[(Z * width) + (X + offset)] ? env.SunXSide : env.ShadowXSide) : env.SunXSide;
+			//int col = fullBright ? FastColour.WhitePacked :
+			//	X <= (maxX - offset) ? (Y > map.heightmap[(Z * width) + (X + offset)] ? env.SunXSide : env.ShadowXSide) : env.SunXSide;
+			
+			
+			int col = FastColour.c0;
+			int safeX = X +offset;
+			if( safeX >= width ) {
+				safeX = width-1;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X +offset, Y, Z] >> 4) == 7 ) {  col = FastColour.c7; }			
+			}
+			
+			FastColour colNice = new FastColour( col );
+			int colXSide;
+			int colZSide;
+			int colYBottom;
+			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
+			col = colXSide;
 			
 			part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col );
 			part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z2 + (count - 1), u2, v1, col );
@@ -119,8 +169,31 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + maxBB.Y * invVerElementSize;
 			float v2 = vOrigin + minBB.Y * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked :
-				Z >= offset ? (Y > map.heightmap[((Z - offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
+			//int col = fullBright ? FastColour.WhitePacked :
+			//	Z >= offset ? (Y > map.heightmap[((Z - offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
+			
+			int col = FastColour.c0;
+			int safeZ = Z -offset;
+			if( safeZ < 0 ) {
+				safeZ = 0;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X, Y, Z -offset] >> 4) == 7 ) {  col = FastColour.c7; }				
+			}
+			
+			FastColour colNice = new FastColour( col );
+			int colXSide;
+			int colZSide;
+			int colYBottom;
+			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
+			col = colZSide;
 			
 			part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v2, col );
 			part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col );
@@ -138,9 +211,34 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + maxBB.Y * invVerElementSize;
 			float v2 = vOrigin + minBB.Y * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked :
-				Z <= (maxZ - offset) ? (Y > map.heightmap[((Z + offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
+			//int col = fullBright ? FastColour.WhitePacked :
+				//Z <= (maxZ - offset) ? (Y > map.heightmap[((Z + offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
 			
+				
+			
+			int col = FastColour.c0;
+			int safeZ = Z +offset;
+			if( safeZ >= length ) {
+				safeZ = length-1;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X, Y, Z +offset] >> 4) == 7 ) {  col = FastColour.c7; }				
+			}
+			
+			FastColour colNice = new FastColour( col );
+			int colXSide;
+			int colZSide;
+			int colYBottom;
+			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
+			col = colZSide;
+				
 			part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col );
 			part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v1, col );
 			part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col );
@@ -157,7 +255,30 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + minBB.Z * invVerElementSize;
 			float v2 = vOrigin + maxBB.Z * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked : ((Y - offset) > map.heightmap[(Z * width) + X] ? env.SunYBottom : env.ShadowYBottom);
+			//int col = fullBright ? FastColour.WhitePacked : ((Y - offset) > map.heightmap[(Z * width) + X] ? env.SunYBottom : env.ShadowYBottom);
+			
+			int col = FastColour.c0;
+			int safeY = Y +offset;
+			if( safeY < 0 ) {
+				safeY = 0;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X, Y -offset, Z] >> 4) == 7 ) {  col = FastColour.c7; }				
+			}
+			
+			FastColour colNice = new FastColour( col );
+			int colXSide;
+			int colZSide;
+			int colYBottom;
+			FastColour.GetShaded(colNice, out colXSide, out colZSide, out colYBottom);
+			col = colYBottom;
 			
 			part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col );
 			part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col );
@@ -175,8 +296,24 @@ namespace ClassicalSharp {
 			float v1 = vOrigin + minBB.Z * invVerElementSize;
 			float v2 = vOrigin + maxBB.Z * invVerElementSize * 15.99f/16f;
 			DrawInfo part = isTranslucent ? translucentParts[i] : normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked : ((Y - offset) >= map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
-
+			//int col = fullBright ? FastColour.WhitePacked : ((Y - offset) >= map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
+			
+			int col = FastColour.c1;
+			int safeY = Y +offset;
+			if( safeY >= height ) {
+				safeY = height-1;
+				col = FastColour.c7;
+			}
+			else {
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 1 ) {  col = FastColour.c1; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 2 ) {  col = FastColour.c2; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 3 ) {  col = FastColour.c3; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 4 ) {  col = FastColour.c4; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 5 ) {  col = FastColour.c5; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 6 ) {  col = FastColour.c6; }
+				if( (LightVolume.volumeArray[X, Y +offset, Z] >> 4) == 7 ) {  col = FastColour.c7; }		
+			}
+				
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col );
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col );
 			part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v2, col );

@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using ClassicalSharp.GraphicsAPI;
 using ClassicalSharp.Textures;
+using ClassicalSharp.Map;
 using OpenTK;
 
 namespace ClassicalSharp {
@@ -181,7 +182,17 @@ namespace ClassicalSharp {
 			const float u1 = 0, u2 = 15.99f/16f;
 			float v1 = vOrigin, v2 = vOrigin + invVerElementSize * 15.99f/16f;
 			DrawInfo part = normalParts[i];
-			int col = fullBright ? FastColour.WhitePacked : (Y > map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
+			//int col = fullBright ? FastColour.WhitePacked : (Y > map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
+			
+			int col = FastColour.c1;
+			
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 1 ) {  col = FastColour.c1; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 2 ) {  col = FastColour.c2; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 3 ) {  col = FastColour.c3; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 4 ) {  col = FastColour.c4; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 5 ) {  col = FastColour.c5; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 6 ) {  col = FastColour.c6; }
+			if( (LightVolume.volumeArray[X, Y, Z] >> 4) == 7 ) {  col = FastColour.c7; }		
 			
 			// Draw Z axis
 			part.vertices[part.sIndex.left++] = new VertexP3fT2fC4b( X + 2.50f/16, Y, Z + 2.5f/16, u2, v2, col );

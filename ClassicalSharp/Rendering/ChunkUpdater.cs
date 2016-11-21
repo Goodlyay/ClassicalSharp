@@ -14,6 +14,7 @@ namespace ClassicalSharp.Renderers {
 		
 		Game game;
 		ChunkMeshBuilder builder;
+		LightVolume lightVolume;
 		BlockInfo info;
 		
 		int width, height, length;
@@ -26,7 +27,17 @@ namespace ClassicalSharp.Renderers {
 			this.game = game;
 			this.renderer = renderer;
 			info = game.BlockInfo;
+			
+			//game.Chat.Add("about to do light volumeChat");
+			
 			InitMeshBuilder();
+			
+			Console.WriteLine("about to do light volume");
+			lightVolume = new LightVolume();
+			lightVolume.Init( game );
+			game.WorldEvents.OnNewMapLoaded += lightVolume.OnNewMapLoaded;
+			
+			
 			
 			game.Events.TerrainAtlasChanged += TerrainAtlasChanged;
 			game.WorldEvents.OnNewMap += OnNewMap;
@@ -51,6 +62,7 @@ namespace ClassicalSharp.Renderers {
 			
 			builder.Init( game );
 			builder.OnNewMapLoaded();
+			
 		}
 		
 		public void Dispose() {

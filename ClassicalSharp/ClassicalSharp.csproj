@@ -4,7 +4,7 @@
     <ProjectGuid>{BEB1C785-5CAD-48FF-A886-876BF0A318D4}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>ClassicalSharp</RootNamespace>
     <AssemblyName>ClassicalSharp</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
@@ -186,6 +186,7 @@
     <Compile Include="Map\Formats\MapSchematic.Exporter.cs" />
     <Compile Include="Map\Formats\MapLvl.Importer.cs" />
     <Compile Include="Map\Formats\NbtFile.cs" />
+    <Compile Include="Map\LightVolume.cs" />
     <Compile Include="Map\WorldEnv.cs" />
     <Compile Include="Math\Physics\AABB.cs" />
     <Compile Include="Math\Physics\IntersectionUtils.cs" />

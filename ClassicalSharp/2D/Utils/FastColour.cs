@@ -144,6 +144,16 @@ namespace ClassicalSharp {
 		public static FastColour Black = new FastColour( 0, 0, 0 );
 		public const int WhitePacked = unchecked((int)0xFFFFFFFF);
 		public const int BlackPacked = unchecked((int)0xFF000000);
+		
+		public const int c0 = unchecked((int)0xFF2E3337);
+		public const int c1 = unchecked((int)0xFF414446);
+		public const int c2 = unchecked((int)0xFF55585B);
+		public const int c3 = unchecked((int)0xFF6D7073);
+		public const int c4 = unchecked((int)0xFF888A8C);
+		public const int c5 = unchecked((int)0xFF9EA0A2);
+		public const int c6 = unchecked((int)0xFFCECFD0);
+		public const int c7 = unchecked((int)0xFFFFFFFF);
+		
 
 		public static FastColour Yellow = new FastColour( 255, 255, 0 );
 		public static FastColour Magenta = new FastColour( 255, 0, 255 );
