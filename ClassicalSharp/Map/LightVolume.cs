@@ -75,7 +75,7 @@ namespace ClassicalSharp.Map {
 			lightLevels = new byte[width, height, length];
 			CastInitial();
 			
-			for( int pass = maxLight - 1; pass > 0; pass-- ) {
+			for( int pass = maxLight; pass > 1; pass-- ) {
 				Console.WriteLine("Starting pass " + pass + "." );
 				DoPass(pass);
 			}
@@ -113,7 +113,7 @@ namespace ClassicalSharp.Map {
 				
 				int skyLight = lightLevels[x, y, z] >> 4;
 				//if the current block is not a light blocker AND the current spot is less than i
-				if( !info.BlocksLight[curBlock] && skyLight >= pass ) {
+				if( !info.BlocksLight[curBlock] && skyLight == pass ) {
 					//check the six neighbors sky light value,
 					if( y < maxY && skyLight > (lightLevels[x, y+1, z] >> 4) ) {
 						lightLevels[x, y+1, z] &= 0x0F; // reset skylight bits to 0
@@ -143,7 +143,7 @@ namespace ClassicalSharp.Map {
 				
 				int blockLight = lightLevels[x, y, z] & 0x0F;
 				//if the current block is not a light blocker AND the current spot is less than i
-				if( (info.FullBright[curBlock] || !info.BlocksLight[curBlock]) && blockLight >= pass ) {
+				if( (info.FullBright[curBlock] || !info.BlocksLight[curBlock]) && blockLight == pass ) {
 					//check the six neighbors sky light value,
 					if( y < maxY && blockLight > (lightLevels[x, y+1, z] & 0x0F) ) {
 						lightLevels[x, y+1, z] &= 0xF0; // reset blocklight bits to 0
