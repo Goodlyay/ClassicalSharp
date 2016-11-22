@@ -327,7 +327,7 @@ namespace ClassicalSharp {
 			FastColour col3 = new FastColour(GetBlockColorTop(X, Y, Z+dZ));
 			FastColour col4 = new FastColour(GetBlockColorTop(X+dX, Y, Z+dZ));
 			
-			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
+			int A = col1.A;
 			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
 			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
 			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
@@ -487,9 +487,9 @@ namespace ClassicalSharp {
 			flags |= ((y - offset) >= lightHeight ? 4 : 0);
 			
 			// Dynamic lighting
-			if( info.FullBright[block] )               flags |= 5;
-			if( info.FullBright[chunk[cIndex + 324]] ) flags |= 4;
-			if( info.FullBright[chunk[cIndex - 324]] ) flags |= 1;
+			//if( info.FullBright[block] )               flags |= 5;
+			//if( info.FullBright[chunk[cIndex + 324]] ) flags |= 4;
+			//if( info.FullBright[chunk[cIndex - 324]] ) flags |= 1;
 			return flags;
 		}
 		

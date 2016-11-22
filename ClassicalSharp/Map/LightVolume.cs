@@ -102,6 +102,13 @@ namespace ClassicalSharp.Map {
 			}
 		}
 		
+		//UnknownShadow200: map.blocks[index + 1] (X + 1)
+		//UnknownShadow200: map.blocks[index + width] (Z + 1)
+		//UnknownShadow200: map.blocks[index + width * length] (Y + 1)
+		
+		//index + (-1) X
+		//index + (-width) Z
+		//index + (-length * width); Y
 		void DoPass( int pass ) {
 			int index = 0;
 			for( int y = 0; y < height; y++ )
@@ -109,35 +116,46 @@ namespace ClassicalSharp.Map {
 					for( int x = 0; x < width; x++ )
 			{
 				byte curBlock = map.blocks[index];
-				index++; // increase one coord
 				
 				int skyLight = lightLevels[x, y, z] >> 4;
 				//if the current block is not a light blocker AND the current spot is less than i
 				if( !info.BlocksLight[curBlock] && skyLight == pass ) {
 					//check the six neighbors sky light value,
 					if( y < maxY && skyLight > (lightLevels[x, y+1, z] >> 4) ) {
-						lightLevels[x, y+1, z] &= 0x0F; // reset skylight bits to 0
-						lightLevels[x, y+1, z] |= (byte)((skyLight - 1) << 4); // set skylight bits
+						if( !info.BlocksLight[map.blocks[index + width * length]] ){
+							lightLevels[x, y+1, z] &= 0x0F; // reset skylight bits to 0
+							lightLevels[x, y+1, z] |= (byte)((skyLight - 1) << 4); // set skylight bits
+						}
 					}
 					if( y > 0 && skyLight > (lightLevels[x, y-1, z] >> 4) ) {
-						lightLevels[x, y-1, z] &= 0x0F;
-						lightLevels[x, y-1, z] |= (byte)((skyLight - 1) << 4);
+						if( !info.BlocksLight[map.blocks[index + (-width * length)]] ) {
+							lightLevels[x, y-1, z] &= 0x0F;
+							lightLevels[x, y-1, z] |= (byte)((skyLight - 1) << 4);
+						}
 					}
 					if( x < maxX && skyLight > (lightLevels[x+1, y, z] >> 4) ) {
-						lightLevels[x+1, y, z] &= 0x0F;
-						lightLevels[x+1, y, z] |= (byte)((skyLight - 1) << 4);
+						if( !info.BlocksLight[map.blocks[index + 1]] ) {
+							lightLevels[x+1, y, z] &= 0x0F;
+							lightLevels[x+1, y, z] |= (byte)((skyLight - 1) << 4);
+						}
 					}
 					if( x > 0 && skyLight > (lightLevels[x-1, y, z] >> 4) ) {
-						lightLevels[x-1, y, z] &= 0x0F;
-						lightLevels[x-1, y, z] |= (byte)((skyLight - 1) << 4);
+						if( !info.BlocksLight[map.blocks[index + (-1)]] ) {
+							lightLevels[x-1, y, z] &= 0x0F;
+							lightLevels[x-1, y, z] |= (byte)((skyLight - 1) << 4);
+						}
 					}
 					if( z < maxZ && skyLight > (lightLevels[x, y, z+1] >> 4) ) {
-						lightLevels[x, y, z+1] &= 0x0F;
-						lightLevels[x, y, z+1] |= (byte)((skyLight - 1) << 4);
+						if( !info.BlocksLight[map.blocks[index + width]] ) {
+							lightLevels[x, y, z+1] &= 0x0F;
+							lightLevels[x, y, z+1] |= (byte)((skyLight - 1) << 4);
+						}
 					}
 					if( z > 0 && skyLight > (lightLevels[x, y, z-1] >> 4) ) {
-						lightLevels[x, y, z-1] &= 0x0F;
-						lightLevels[x, y, z-1] |= (byte)((skyLight - 1) << 4);
+						if( !info.BlocksLight[map.blocks[index + (-width)]] ) {
+							lightLevels[x, y, z-1] &= 0x0F;
+							lightLevels[x, y, z-1] |= (byte)((skyLight - 1) << 4);
+						}
 					}
 				}
 				
@@ -146,30 +164,43 @@ namespace ClassicalSharp.Map {
 				if( (info.FullBright[curBlock] || !info.BlocksLight[curBlock]) && blockLight == pass ) {
 					//check the six neighbors sky light value,
 					if( y < maxY && blockLight > (lightLevels[x, y+1, z] & 0x0F) ) {
-						lightLevels[x, y+1, z] &= 0xF0; // reset blocklight bits to 0
-						lightLevels[x, y+1, z] |= (byte)(blockLight - 1); // set blocklight bits
+						if( !info.BlocksLight[map.blocks[index + width * length]] ){
+							lightLevels[x, y+1, z] &= 0xF0; // reset blocklight bits to 0
+							lightLevels[x, y+1, z] |= (byte)(blockLight - 1); // set blocklight bits
+						}
 					}
 					if( y > 0 && blockLight > (lightLevels[x, y-1, z] & 0x0F) ) {
-						lightLevels[x, y-1, z] &= 0xF0;
-						lightLevels[x, y-1, z] |= (byte)(blockLight - 1);
+						if( !info.BlocksLight[map.blocks[index + (-width * length)]] ) {
+							lightLevels[x, y-1, z] &= 0xF0;
+							lightLevels[x, y-1, z] |= (byte)(blockLight - 1);
+						}
 					}
 					if( x < maxX && blockLight > (lightLevels[x+1, y, z] & 0x0F) ) {
-						lightLevels[x+1, y, z] &= 0xF0;
-						lightLevels[x+1, y, z] |= (byte)(blockLight - 1);
+						if( !info.BlocksLight[map.blocks[index + 1]] ) {
+							lightLevels[x+1, y, z] &= 0xF0;
+							lightLevels[x+1, y, z] |= (byte)(blockLight - 1);
+						}
 					}
 					if( x > 0 && blockLight > (lightLevels[x-1, y, z] & 0x0F) ) {
-						lightLevels[x-1, y, z] &= 0xF0;
-						lightLevels[x-1, y, z] |= (byte)(blockLight - 1);
+						if( !info.BlocksLight[map.blocks[index + (-1)]] ) {
+							lightLevels[x-1, y, z] &= 0xF0;
+							lightLevels[x-1, y, z] |= (byte)(blockLight - 1);
+						}
 					}
 					if( z < maxZ && blockLight > (lightLevels[x, y, z+1] & 0x0F) ) {
-						lightLevels[x, y, z+1] &= 0xF0;
-						lightLevels[x, y, z+1] |= (byte)(blockLight - 1);
+						if( !info.BlocksLight[map.blocks[index + width]] ) {
+							lightLevels[x, y, z+1] &= 0xF0;
+							lightLevels[x, y, z+1] |= (byte)(blockLight - 1);
+						}
 					}
 					if( z > 0 && blockLight > (lightLevels[x, y, z-1] & 0x0F) ) {
-						lightLevels[x, y, z-1] &= 0xF0;
-						lightLevels[x, y, z-1] |= (byte)(blockLight - 1);
+						if( !info.BlocksLight[map.blocks[index + (-width)]] ) {
+							lightLevels[x, y, z-1] &= 0xF0;
+							lightLevels[x, y, z-1] |= (byte)(blockLight - 1);
+						}
 					}
 				}
+				index++; // increase one coord
 			}
 		}
 	}
