@@ -10,6 +10,7 @@ namespace ClassicalSharp {
 		
 		int initBitFlags;
 		protected override int StretchXLiquid( int xx, int countIndex, int x, int y, int z, int chunkIndex, byte block ) {
+			return 1;
 			if( OccludedLiquid( chunkIndex ) ) return 0;
 			initBitFlags = ComputeLightFlags( x, y, z, chunkIndex );
 			bitFlags[chunkIndex] = initBitFlags;
@@ -32,6 +33,7 @@ namespace ClassicalSharp {
 		}
 		
 		protected override int StretchX( int xx, int countIndex, int x, int y, int z, int chunkIndex, byte block, int face ) {
+			return 1;
 			initBitFlags = ComputeLightFlags( x, y, z, chunkIndex );
 			bitFlags[chunkIndex] = initBitFlags;
 			
@@ -53,6 +55,7 @@ namespace ClassicalSharp {
 		}
 		
 		protected override int StretchZ( int zz, int countIndex, int x, int y, int z, int chunkIndex, byte block, int face ) {
+			return 1;
 			initBitFlags = ComputeLightFlags( x, y, z, chunkIndex );
 			bitFlags[chunkIndex] = initBitFlags;
 			
@@ -100,20 +103,26 @@ namespace ClassicalSharp {
 			int aY0_Z1 = ((F >> xM1_yM1_zP1) & 1) + ((F >> xM1_yCC_zP1) & 1) + ((F >> xM1_yM1_zCC) & 1) + ((F >> xM1_yCC_zCC) & 1);
 			int aY1_Z0 = ((F >> xM1_yP1_zM1) & 1) + ((F >> xM1_yCC_zM1) & 1) + ((F >> xM1_yP1_zCC) & 1) + ((F >> xM1_yCC_zCC) & 1);
 			int aY1_Z1 = ((F >> xM1_yP1_zP1) & 1) + ((F >> xM1_yCC_zP1) & 1) + ((F >> xM1_yP1_zCC) & 1) + ((F >> xM1_yCC_zCC) & 1);
-			int col0_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z0 );
-			int col1_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z1 );
+			//int col0_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z0 );
+			//int col1_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z1 );
 			
-			if( aY0_Z0 + aY1_Z1 > aY0_Z1 + aY1_Z0 ) {
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col1_0 );
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z2 + (count - 1), u2, v2, col0_1 );
+			
+			int col0_0 = AverageColorsXSide(X-offset, Y, Z, -1, -1);
+			int col0_1 = AverageColorsXSide(X-offset, Y, Z, -1, +1);
+			int col1_1 = AverageColorsXSide(X-offset, Y, Z, +1, +1);
+			int col1_0 = AverageColorsXSide(X-offset, Y, Z, +1, -1);
+			
+			//if( aY0_Z0 + aY1_Z1 > aY0_Z1 + aY1_Z0 ) {
+			//	part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col1_0 );
+			//	part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
+			//	part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z2 + (count - 1), u2, v2, col0_1 );
+			//	part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z2 + (count - 1), u2, v1, col1_1 );
+			//} else {
 				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z2 + (count - 1), u2, v1, col1_1 );
-			} else {
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z2 + (count - 1), u2, v1, col1_1 );
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col1_0 );
+				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_1 );
 				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
-				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z2 + (count - 1), u2, v2, col0_1 );
-			}
+				part.vertices[part.vIndex.left++] = new VertexP3fT2fC4b( x1, y1, z2 + (count - 1), u2, v2, col1_0 );
+			//}
 		}
 
 		protected override void DrawRightFace( int count ) {
@@ -132,20 +141,26 @@ namespace ClassicalSharp {
 			int aY0_Z1 = ((F >> xP1_yM1_zP1) & 1) + ((F >> xP1_yCC_zP1) & 1) + ((F >> xP1_yM1_zCC) & 1) + ((F >> xP1_yCC_zCC) & 1);
 			int aY1_Z0 = ((F >> xP1_yP1_zM1) & 1) + ((F >> xP1_yCC_zM1) & 1) + ((F >> xP1_yP1_zCC) & 1) + ((F >> xP1_yCC_zCC) & 1);
 			int aY1_Z1 = ((F >> xP1_yP1_zP1) & 1) + ((F >> xP1_yCC_zP1) & 1) + ((F >> xP1_yP1_zCC) & 1) + ((F >> xP1_yCC_zCC) & 1);
-			int col0_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z0 );
-			int col1_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z1 );
+			//int col0_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z0 );
+			//int col1_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeXSide( aY0_Z1 );
 			
-			if( aY0_Z0 + aY1_Z1 > aY0_Z1 + aY1_Z0 ) {
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col1_0 );
+			
+			int col0_0 = AverageColorsXSide(X+offset, Y, Z, -1, -1);
+			int col0_1 = AverageColorsXSide(X+offset, Y, Z, -1, +1);
+			int col1_1 = AverageColorsXSide(X+offset, Y, Z, +1, +1);
+			int col1_0 = AverageColorsXSide(X+offset, Y, Z, +1, -1);
+			
+			//if( aY0_Z0 + aY1_Z1 > aY0_Z1 + aY1_Z0 ) {
+			//	part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col1_0 );
+			//	part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z2 + (count - 1), u2, v1, col1_1 );
+			//	part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z2 + (count - 1), u2, v2, col0_1 );
+			//	part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z1, u1, v2, col0_0 );
+			//} else {
 				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z2 + (count - 1), u2, v1, col1_1 );
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z2 + (count - 1), u2, v2, col0_1 );
+				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z2 + (count - 1), u2, v2, col1_0 );
 				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z1, u1, v2, col0_0 );
-			} else {
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z2 + (count - 1), u2, v1, col1_1 );
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z2 + (count - 1), u2, v2, col0_1 );
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y1, z1, u1, v2, col0_0 );
-				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col1_0 );
-			}
+				part.vertices[part.vIndex.right++] = new VertexP3fT2fC4b( x2, y2, z1, u1, v1, col0_1 );
+			//}
 		}
 
 		protected override void DrawFrontFace( int count ) {
@@ -164,20 +179,26 @@ namespace ClassicalSharp {
 			int aX0_Y1 = ((F >> xM1_yP1_zM1) & 1) + ((F >> xM1_yCC_zM1) & 1) + ((F >> xCC_yP1_zM1) & 1) + ((F >> xCC_yCC_zM1) & 1);
 			int aX1_Y0 = ((F >> xP1_yM1_zM1) & 1) + ((F >> xP1_yCC_zM1) & 1) + ((F >> xCC_yM1_zM1) & 1) + ((F >> xCC_yCC_zM1) & 1);
 			int aX1_Y1 = ((F >> xP1_yP1_zM1) & 1) + ((F >> xP1_yCC_zM1) & 1) + ((F >> xCC_yP1_zM1) & 1) + ((F >> xCC_yCC_zM1) & 1);
-			int col0_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y0 );
-			int col1_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y1 );
+			//int col0_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y0 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y0 );
+			//int col1_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y1 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y1 );
 			
-			if( aX1_Y1 + aX0_Y0 > aX0_Y1 + aX1_Y0 ) {
-				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v2, col1_0 );
+			
+			int col0_0 = AverageColorsZSide(X, Y, Z-offset, -1, -1);
+			int col0_1 = AverageColorsZSide(X, Y, Z-offset, -1, +1);
+			int col1_1 = AverageColorsZSide(X, Y, Z-offset, +1, +1);
+			int col1_0 = AverageColorsZSide(X, Y, Z-offset, +1, -1);
+			
+			//if( aX1_Y1 + aX0_Y0 > aX0_Y1 + aX1_Y0 ) {
+			//	part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v2, col1_0 );
+			//	part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
+			//	part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_1 );
+			//	part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_1 );
+			//} else {
 				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
 				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_1 );
 				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_1 );
-			} else {
-				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v2, col0_0 );
-				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_1 );
-				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_1 );
 				part.vertices[part.vIndex.front++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v2, col1_0 );
-			}
+			//}
 		}
 		
 		protected override void DrawBackFace( int count ) {
@@ -196,20 +217,26 @@ namespace ClassicalSharp {
 			int aX1_Y0 = ((F >> xP1_yM1_zP1) & 1) + ((F >> xP1_yCC_zP1) & 1) + ((F >> xCC_yM1_zP1) & 1) + ((F >> xCC_yCC_zP1) & 1);
 			int aX0_Y1 = ((F >> xM1_yP1_zP1) & 1) + ((F >> xM1_yCC_zP1) & 1) + ((F >> xCC_yP1_zP1) & 1) + ((F >> xCC_yCC_zP1) & 1);
 			int aX1_Y1 = ((F >> xP1_yP1_zP1) & 1) + ((F >> xP1_yCC_zP1) & 1) + ((F >> xCC_yP1_zP1) & 1) + ((F >> xCC_yCC_zP1) & 1);
-			int col1_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y1 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y0 );
-			int col0_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y0 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y1 );
+			//int col1_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y1 ), col1_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX1_Y0 );
+			//int col0_0 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y0 ), col0_1 = fullBright ? FastColour.WhitePacked : MakeZSide( aX0_Y1 );
 			
-			if( aX1_Y1 + aX0_Y0 > aX0_Y1 + aX1_Y0 ) {
+			
+			int col0_0 = AverageColorsZSide(X, Y, Z+offset, -1, -1);
+			int col0_1 = AverageColorsZSide(X, Y, Z+offset, -1, +1);
+			int col1_1 = AverageColorsZSide(X, Y, Z+offset, +1, +1);
+			int col1_0 = AverageColorsZSide(X, Y, Z+offset, +1, -1);
+			
+			//if( aX1_Y1 + aX0_Y0 > aX0_Y1 + aX1_Y0 ) {
+			//	part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v1, col0_1 );
+			//	part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_0 );
+			//	part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_0 );
+			//	part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col1_1 );
+			//} else {
+				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col1_1 );
 				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v1, col0_1 );
 				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_0 );
 				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_0 );
-				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col1_1 );
-			} else {
-				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v1, col1_1 );
-				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v1, col0_1 );
-				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_0 );
-				part.vertices[part.vIndex.back++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_0 );
-			}
+			//}
 		}
 		
 		protected override void DrawBottomFace( int count ) {
@@ -228,20 +255,26 @@ namespace ClassicalSharp {
 			int aX1_Z0 = ((F >> xP1_yM1_zM1) & 1) + ((F >> xP1_yM1_zCC) & 1) + ((F >> xCC_yM1_zM1) & 1) + ((F >> xCC_yM1_zCC) & 1);
 			int aX0_Z1 = ((F >> xM1_yM1_zP1) & 1) + ((F >> xM1_yM1_zCC) & 1) + ((F >> xCC_yM1_zP1) & 1) + ((F >> xCC_yM1_zCC) & 1);
 			int aX1_Z1 = ((F >> xP1_yM1_zP1) & 1) + ((F >> xP1_yM1_zCC) & 1) + ((F >> xCC_yM1_zP1) & 1) + ((F >> xCC_yM1_zCC) & 1);
-			int col0_1 = fullBright ? FastColour.WhitePacked : MakeYSide( aX0_Z1 ), col1_1 = fullBright ? FastColour.WhitePacked : MakeYSide( aX1_Z1 );
-			int col1_0 = fullBright ? FastColour.WhitePacked : MakeYSide( aX1_Z0 ), col0_0 = fullBright ? FastColour.WhitePacked : MakeYSide( aX0_Z0 );
+			//int col0_1 = fullBright ? FastColour.WhitePacked : MakeYSide( aX0_Z1 ), col1_1 = fullBright ? FastColour.WhitePacked : MakeYSide( aX1_Z1 );
+			//int col1_0 = fullBright ? FastColour.WhitePacked : MakeYSide( aX1_Z0 ), col0_0 = fullBright ? FastColour.WhitePacked : MakeYSide( aX0_Z0 );
 			
-			if( aX0_Z1 + aX1_Z0 > aX0_Z0 + aX1_Z1 ) {
-				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_1 );
+			
+			int col0_0 = AverageColorsBottom(X, Y-offset, Z, -1, -1);
+			int col0_1 = AverageColorsBottom(X, Y-offset, Z, -1, +1);
+			int col1_1 = AverageColorsBottom(X, Y-offset, Z, +1, +1);
+			int col1_0 = AverageColorsBottom(X, Y-offset, Z, +1, -1);
+			
+			//if( aX0_Z1 + aX1_Z0 > aX0_Z0 + aX1_Z1 ) {
+				//part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_1 );
+				//part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_1 );
+				//part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v1, col0_0 );
+				//part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v1, col1_0 );
+			//} else {
 				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_1 );
 				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v1, col0_0 );
 				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v1, col1_0 );
-			} else {
-				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z2, u1, v2, col0_1 );
-				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x1, y1, z1, u1, v1, col0_0 );
-				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z1, u2, v1, col1_0 );
 				part.vertices[part.vIndex.bottom++] = new VertexP3fT2fC4b( x2 + (count - 1), y1, z2, u2, v2, col1_1 );
-			}
+			//}
 		}
 
 		protected override void DrawTopFace( int count ) {
@@ -260,20 +293,139 @@ namespace ClassicalSharp {
 			int aX1_Z0 = ((F >> xP1_yP1_zM1) & 1) + ((F >> xP1_yP1_zCC) & 1) + ((F >> xCC_yP1_zM1) & 1) + ((F >> xCC_yP1_zCC) & 1);
 			int aX0_Z1 = ((F >> xM1_yP1_zP1) & 1) + ((F >> xM1_yP1_zCC) & 1) + ((F >> xCC_yP1_zP1) & 1) + ((F >> xCC_yP1_zCC) & 1);
 			int aX1_Z1 = ((F >> xP1_yP1_zP1) & 1) + ((F >> xP1_yP1_zCC) & 1) + ((F >> xCC_yP1_zP1) & 1) + ((F >> xCC_yP1_zCC) & 1);
-			int col0_0 = fullBright ? FastColour.WhitePacked : Make( aX0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : Make( aX1_Z0 );
-			int col1_1 = fullBright ? FastColour.WhitePacked : Make( aX1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : Make( aX0_Z1 );
+			//int col0_0 = fullBright ? FastColour.WhitePacked : Make( aX0_Z0 ), col1_0 = fullBright ? FastColour.WhitePacked : Make( aX1_Z0 );
+			//int col1_1 = fullBright ? FastColour.WhitePacked : Make( aX1_Z1 ), col0_1 = fullBright ? FastColour.WhitePacked : Make( aX0_Z1 );
 			
-			if( aX0_Z0 + aX1_Z1 > aX0_Z1 + aX1_Z0 ) {
-				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_0 );
+			
+			
+			int col0_0 = AverageColorsTop(X, Y+offset, Z, -1, -1);
+			int col0_1 = AverageColorsTop(X, Y+offset, Z, -1, +1);
+			int col1_1 = AverageColorsTop(X, Y+offset, Z, +1, +1);
+			int col1_0 = AverageColorsTop(X, Y+offset, Z, +1, -1);
+			
+
+			
+			//Console.WriteLine("aX0_Z0 is " + aX0_Z0 + ".");
+			//if( aX0_Z0 + aX1_Z1 > aX0_Z1 + aX1_Z0 ) {
+				//part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_0 );
+				//part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_0 );
+				//part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v2, col0_1 );
+				//part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v2, col1_1 );
+			//} else {
 				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_0 );
 				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v2, col0_1 );
 				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v2, col1_1 );
-			} else {
-				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z1, u1, v1, col0_0 );
-				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x1, y2, z2, u1, v2, col0_1 );
-				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z2, u2, v2, col1_1 );
 				part.vertices[part.vIndex.top++] = new VertexP3fT2fC4b( x2 + (count - 1), y2, z1, u2, v1, col1_0 );
+			//}
+		}
+		
+		
+		
+		int AverageColorsTop( int X, int Y, int Z, int dX, int dZ) {
+			FastColour col1 = new FastColour(GetBlockColorTop(X, Y, Z));
+			FastColour col2 = new FastColour(GetBlockColorTop(X+dX, Y, Z));
+			FastColour col3 = new FastColour(GetBlockColorTop(X, Y, Z+dZ));
+			FastColour col4 = new FastColour(GetBlockColorTop(X+dX, Y, Z+dZ));
+			
+			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
+			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
+			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
+			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			
+			#if !USE_DX
+			return A << 24 | B << 16 | G << 8 | R;
+			#else
+			return A << 24 | R << 16 | G << 8 | B;
+			#endif
+		}
+		int GetBlockColorTop( int X, int Y, int Z ) {
+			if( map.IsValidPos(X, Y, Z) ) {
+				int light = LightVolume.lightLevels[X, Y, Z];
+				
+				return LightVolume.lightmap[light >> 4, light & 0xF];
 			}
+			return LightVolume.lightmap[LightVolume.maxLight, 0];
+		}
+		
+		
+		int AverageColorsBottom( int X, int Y, int Z, int dX, int dZ) {
+			FastColour col1 = new FastColour(GetBlockColorBottom(X, Y, Z));
+			FastColour col2 = new FastColour(GetBlockColorBottom(X+dX, Y, Z));
+			FastColour col3 = new FastColour(GetBlockColorBottom(X, Y, Z+dZ));
+			FastColour col4 = new FastColour(GetBlockColorBottom(X+dX, Y, Z+dZ));
+			
+			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
+			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
+			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
+			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			
+			#if !USE_DX
+			return A << 24 | B << 16 | G << 8 | R;
+			#else
+			return A << 24 | R << 16 | G << 8 | B;
+			#endif
+		}
+		int GetBlockColorBottom( int X, int Y, int Z ) {
+			if( map.IsValidPos(X, Y, Z) ) {
+				int light = LightVolume.lightLevels[X, Y, Z];
+				
+				return LightVolume.lightmapYBottom[light >> 4, light & 0xF];
+			}
+			return LightVolume.lightmapYBottom[LightVolume.maxLight, 0];
+		}
+		
+		
+		int AverageColorsZSide( int X, int Y, int Z, int dX, int dY) {
+			FastColour col1 = new FastColour(GetBlockColorZSide(X, Y, Z));
+			FastColour col2 = new FastColour(GetBlockColorZSide(X+dX, Y, Z));
+			FastColour col3 = new FastColour(GetBlockColorZSide(X, Y+dY, Z));
+			FastColour col4 = new FastColour(GetBlockColorZSide(X+dX, Y+dY, Z));
+			
+			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
+			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
+			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
+			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			
+			#if !USE_DX
+			return A << 24 | B << 16 | G << 8 | R;
+			#else
+			return A << 24 | R << 16 | G << 8 | B;
+			#endif
+		}
+		int GetBlockColorZSide( int X, int Y, int Z ) {
+			if( map.IsValidPos(X, Y, Z) ) {
+				int light = LightVolume.lightLevels[X, Y, Z];
+				
+				return LightVolume.lightmapZSide[light >> 4, light & 0xF];
+			}
+			return LightVolume.lightmapZSide[LightVolume.maxLight, 0];
+		}
+		
+		
+		int AverageColorsXSide( int X, int Y, int Z, int dZ, int dY) {
+			FastColour col1 = new FastColour(GetBlockColorXSide(X, Y, Z));
+			FastColour col2 = new FastColour(GetBlockColorXSide(X, Y, Z+dZ));
+			FastColour col3 = new FastColour(GetBlockColorXSide(X, Y+dY, Z));
+			FastColour col4 = new FastColour(GetBlockColorXSide(X, Y+dY, Z+dZ));
+			
+			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
+			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
+			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
+			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			
+			#if !USE_DX
+			return A << 24 | B << 16 | G << 8 | R;
+			#else
+			return A << 24 | R << 16 | G << 8 | B;
+			#endif
+		}
+		int GetBlockColorXSide( int X, int Y, int Z ) {
+			if( map.IsValidPos(X, Y, Z) ) {
+				int light = LightVolume.lightLevels[X, Y, Z];
+				
+				return LightVolume.lightmapXSide[light >> 4, light & 0xF];
+			}
+			return LightVolume.lightmapXSide[LightVolume.maxLight, 0];
 		}
 		
 		int Make( int count ) { return Lerp( env.Shadow, env.Sun, count / 4f ); }

@@ -13,8 +13,8 @@ namespace ClassicalSharp.Map {
 		BlockInfo info;
 		
 		int width, length, height, sidesLevel, edgeLevel;
-		const byte lightExtent = 8;
-		const byte maxLight = (byte)(lightExtent - 1);
+		public const byte lightExtent = 8;
+		public const byte maxLight = (byte)(lightExtent - 1);
 		protected int maxX, maxY, maxZ;
 		public static byte[, ,] lightLevels;
 		public static int[,] lightmap, lightmapZSide, lightmapXSide, lightmapYBottom;
