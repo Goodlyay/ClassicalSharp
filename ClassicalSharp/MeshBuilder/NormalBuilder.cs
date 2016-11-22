@@ -88,7 +88,9 @@ namespace ClassicalSharp {
 			//	X >= offset ? (Y > map.heightmap[(Z * width) + (X - offset)] ? env.SunXSide : env.ShadowXSide) : env.SunXSide;
 			
 			int col;
-			if( X - offset < 0 ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( X - offset < 0 ) {
 				col = LightVolume.lightmapXSide[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X - offset, Y, Z];
@@ -116,7 +118,9 @@ namespace ClassicalSharp {
 			
 			
 			int col;
-			if( X + offset >= width ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( X + offset >= width ) {
 				col = LightVolume.lightmapXSide[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X + offset, Y, Z];
@@ -143,7 +147,9 @@ namespace ClassicalSharp {
 			//	Z >= offset ? (Y > map.heightmap[((Z - offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
 			
 			int col;
-			if( Z - offset < 0 ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( Z - offset < 0 ) {
 				col = LightVolume.lightmapZSide[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X, Y, Z - offset];
@@ -170,7 +176,9 @@ namespace ClassicalSharp {
 			//Z <= (maxZ - offset) ? (Y > map.heightmap[((Z + offset) * width) + X] ? env.SunZSide : env.ShadowZSide) : env.SunZSide;
 			
 			int col;
-			if( Z + offset >= length ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( Z + offset >= length ) {
 				col = LightVolume.lightmapZSide[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X, Y, Z + offset];
@@ -196,7 +204,9 @@ namespace ClassicalSharp {
 			//int col = fullBright ? FastColour.WhitePacked : ((Y - offset) > map.heightmap[(Z * width) + X] ? env.SunYBottom : env.ShadowYBottom);
 			
 			int col;
-			if( Y - offset < 0 ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( Y - offset < 0 ) {
 				col = LightVolume.lightmapYBottom[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X, Y - offset, Z];
@@ -222,7 +232,9 @@ namespace ClassicalSharp {
 			//int col = fullBright ? FastColour.WhitePacked : ((Y - offset) >= map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
 			
 			int col;
-			if( Y + offset >= height ) {
+			if( fullBright ) {
+				col = FastColour.WhitePacked;
+			} else if( Y + offset >= height ) {
 				col = LightVolume.lightmap[7, 7];
 			} else {
 				int light = LightVolume.lightLevels[X, Y + offset, Z];

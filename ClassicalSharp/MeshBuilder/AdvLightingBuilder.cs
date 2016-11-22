@@ -322,20 +322,20 @@ namespace ClassicalSharp {
 		
 		
 		int AverageColorsTop( int X, int Y, int Z, int dX, int dZ) {
+			if (fullBright) return FastColour.WhitePacked;
 			FastColour col1 = new FastColour(GetBlockColorTop(X, Y, Z));
 			FastColour col2 = new FastColour(GetBlockColorTop(X+dX, Y, Z));
 			FastColour col3 = new FastColour(GetBlockColorTop(X, Y, Z+dZ));
 			FastColour col4 = new FastColour(GetBlockColorTop(X+dX, Y, Z+dZ));
 			
-			int A = col1.A;
 			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
 			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
 			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
 			
 			#if !USE_DX
-			return A << 24 | B << 16 | G << 8 | R;
+			return 255 << 24 | B << 16 | G << 8 | R;
 			#else
-			return A << 24 | R << 16 | G << 8 | B;
+			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
 		int GetBlockColorTop( int X, int Y, int Z ) {
@@ -349,20 +349,20 @@ namespace ClassicalSharp {
 		
 		
 		int AverageColorsBottom( int X, int Y, int Z, int dX, int dZ) {
+			if (fullBright) return FastColour.WhitePacked;
 			FastColour col1 = new FastColour(GetBlockColorBottom(X, Y, Z));
 			FastColour col2 = new FastColour(GetBlockColorBottom(X+dX, Y, Z));
 			FastColour col3 = new FastColour(GetBlockColorBottom(X, Y, Z+dZ));
 			FastColour col4 = new FastColour(GetBlockColorBottom(X+dX, Y, Z+dZ));
 			
-			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
 			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
 			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
 			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
 			
 			#if !USE_DX
-			return A << 24 | B << 16 | G << 8 | R;
+			return 255 << 24 | B << 16 | G << 8 | R;
 			#else
-			return A << 24 | R << 16 | G << 8 | B;
+			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
 		int GetBlockColorBottom( int X, int Y, int Z ) {
@@ -376,20 +376,20 @@ namespace ClassicalSharp {
 		
 		
 		int AverageColorsZSide( int X, int Y, int Z, int dX, int dY) {
+			if (fullBright) return FastColour.WhitePacked;
 			FastColour col1 = new FastColour(GetBlockColorZSide(X, Y, Z));
 			FastColour col2 = new FastColour(GetBlockColorZSide(X+dX, Y, Z));
 			FastColour col3 = new FastColour(GetBlockColorZSide(X, Y+dY, Z));
 			FastColour col4 = new FastColour(GetBlockColorZSide(X+dX, Y+dY, Z));
 			
-			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
 			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
 			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
 			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
 			
 			#if !USE_DX
-			return A << 24 | B << 16 | G << 8 | R;
+			return 255 << 24 | B << 16 | G << 8 | R;
 			#else
-			return A << 24 | R << 16 | G << 8 | B;
+			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
 		int GetBlockColorZSide( int X, int Y, int Z ) {
@@ -403,20 +403,20 @@ namespace ClassicalSharp {
 		
 		
 		int AverageColorsXSide( int X, int Y, int Z, int dZ, int dY) {
+			if (fullBright) return FastColour.WhitePacked;
 			FastColour col1 = new FastColour(GetBlockColorXSide(X, Y, Z));
 			FastColour col2 = new FastColour(GetBlockColorXSide(X, Y, Z+dZ));
 			FastColour col3 = new FastColour(GetBlockColorXSide(X, Y+dY, Z));
 			FastColour col4 = new FastColour(GetBlockColorXSide(X, Y+dY, Z+dZ));
 			
-			int A = (col1.A + col2.A + col3.A + col4.A) / 4;
 			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
 			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
 			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
 			
 			#if !USE_DX
-			return A << 24 | B << 16 | G << 8 | R;
+			return 255 << 24 | B << 16 | G << 8 | R;
 			#else
-			return A << 24 | R << 16 | G << 8 | B;
+			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
 		int GetBlockColorXSide( int X, int Y, int Z ) {

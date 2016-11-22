@@ -185,7 +185,7 @@ namespace ClassicalSharp {
 			//int col = fullBright ? FastColour.WhitePacked : (Y > map.heightmap[(Z * width) + X] ? env.Sun : env.Shadow);
 			
 			int light = LightVolume.lightLevels[X, Y, Z];
-			int col = LightVolume.lightmap[light >> 4, light & 0xF];		
+			int col = fullBright ? FastColour.WhitePacked : LightVolume.lightmap[light >> 4, light & 0xF];
 			
 			// Draw Z axis
 			part.vertices[part.sIndex.left++] = new VertexP3fT2fC4b( X + 2.50f/16, Y, Z + 2.5f/16, u2, v2, col );
