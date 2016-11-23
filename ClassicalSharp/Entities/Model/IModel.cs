@@ -87,7 +87,24 @@ namespace ClassicalSharp.Model {
 			pos = p.Position;
 			if( Bobbing ) pos.Y += p.anim.bobbingModel;
 			World map = game.World;
-			col = game.World.IsLit( p.EyePosition ) ? map.Env.Sunlight : map.Env.Shadowlight;
+			
+			int X = (int)p.EyePosition.X;
+			int Y = (int)p.EyePosition.Y;
+			int Z = (int)p.EyePosition.Z;
+			int light;
+			int intCol;
+			bool inBounds = map.IsValidPos(X, Y, Z);
+			
+			if( inBounds ) {
+				light = LightVolume.lightLevels[X, Y, Z];
+				intCol = LightVolume.lightmap[light >> 4, light & 0xF];
+			} else {
+				intCol = LightVolume.lightmap[7, 0];
+			}
+			
+			col = new FastColour(intCol);
+			//col = game.World.IsLit( p.EyePosition ) ? map.Env.Sunlight : map.Env.Shadowlight;
+			
 			uScale = 1 / 64f; vScale = 1 / 32f;
 			scale = p.ModelScale;
 			

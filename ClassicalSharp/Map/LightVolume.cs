@@ -111,48 +111,70 @@ namespace ClassicalSharp.Map {
 		//index + (-length * width); Y
 		void DoPass( int pass ) {
 			int index = 0;
+			
+			bool[] fullBlock = new bool[Block.Count];
+			for (int i = 0; i < fullBlock.Length; i++) {
+				fullBlock[i] =
+					game.BlockInfo.MinBB[i] == OpenTK.Vector3.Zero &&
+					game.BlockInfo.MaxBB[i] == OpenTK.Vector3.One;
+			}
+			
 			for( int y = 0; y < height; y++ )
 				for( int z = 0; z < length; z++ )
 					for( int x = 0; x < width; x++ )
 			{
 				byte curBlock = map.blocks[index];
 				
+				byte neBlock;
+				
 				int skyLight = lightLevels[x, y, z] >> 4;
 				//if the current block is not a light blocker AND the current spot is less than i
 				if( !info.BlocksLight[curBlock] && skyLight == pass ) {
 					//check the six neighbors sky light value,
 					if( y < maxY && skyLight > (lightLevels[x, y+1, z] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + width * length]] ){
+						
+						neBlock = map.blocks[index + width * length];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]){
 							lightLevels[x, y+1, z] &= 0x0F; // reset skylight bits to 0
 							lightLevels[x, y+1, z] |= (byte)((skyLight - 1) << 4); // set skylight bits
 						}
 					}
 					if( y > 0 && skyLight > (lightLevels[x, y-1, z] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + (-width * length)]] ) {
+						
+						neBlock = map.blocks[index + (-width * length)];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]) {
 							lightLevels[x, y-1, z] &= 0x0F;
 							lightLevels[x, y-1, z] |= (byte)((skyLight - 1) << 4);
 						}
 					}
 					if( x < maxX && skyLight > (lightLevels[x+1, y, z] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + 1]] ) {
+						
+						neBlock = map.blocks[index + 1];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]) {
 							lightLevels[x+1, y, z] &= 0x0F;
 							lightLevels[x+1, y, z] |= (byte)((skyLight - 1) << 4);
 						}
 					}
 					if( x > 0 && skyLight > (lightLevels[x-1, y, z] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + (-1)]] ) {
+						
+						neBlock = map.blocks[index + (-1)];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]) {
 							lightLevels[x-1, y, z] &= 0x0F;
 							lightLevels[x-1, y, z] |= (byte)((skyLight - 1) << 4);
 						}
 					}
 					if( z < maxZ && skyLight > (lightLevels[x, y, z+1] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + width]] ) {
+						
+						neBlock = map.blocks[index + width];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]) {
 							lightLevels[x, y, z+1] &= 0x0F;
 							lightLevels[x, y, z+1] |= (byte)((skyLight - 1) << 4);
 						}
 					}
 					if( z > 0 && skyLight > (lightLevels[x, y, z-1] >> 4) ) {
-						if( !info.BlocksLight[map.blocks[index + (-width)]] ) {
+						
+						neBlock = map.blocks[index + (-width)];
+						if( !info.BlocksLight[neBlock] || !fullBlock[neBlock]) {
 							lightLevels[x, y, z-1] &= 0x0F;
 							lightLevels[x, y, z-1] |= (byte)((skyLight - 1) << 4);
 						}

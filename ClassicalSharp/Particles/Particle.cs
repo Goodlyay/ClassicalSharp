@@ -85,8 +85,24 @@ namespace ClassicalSharp.Particles {
 			
 			World map = game.World;
 			bool fullBright = (flags & 0x100) != 0;
-			int col = fullBright ? FastColour.WhitePacked
-				: (map.IsLit( Position ) ? map.Env.SunZSide : map.Env.ShadowZSide);
+			
+			int X = (int)Position.X;
+			int Y = (int)Position.Y;
+			int Z = (int)Position.Z;
+			int light;
+			int intCol;
+			bool inBounds = map.IsValidPos(X, Y, Z);
+			
+			if( inBounds ) {
+				light = LightVolume.lightLevels[X, Y, Z];
+				intCol = LightVolume.lightmap[light >> 4, light & 0xF];
+			} else {
+				intCol = LightVolume.lightmap[7, 0];
+			}
+			if( fullBright ) { intCol = FastColour.WhitePacked; }
+			int col = intCol;
+			//int col = fullBright ? FastColour.WhitePacked
+			//	: (map.IsLit( Position ) ? map.Env.SunZSide : map.Env.ShadowZSide);
 			DoRender( game, ref terrainSize, ref rec, col, vertices, ref index );
 		}
 	}

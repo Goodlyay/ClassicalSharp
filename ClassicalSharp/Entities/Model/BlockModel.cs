@@ -82,8 +82,24 @@ namespace ClassicalSharp.Model {
 			// a string every single time held block changes.
 			if( p is FakePlayer ) {
 				Player realP = game.LocalPlayer;
-				col = game.World.IsLit( realP.EyePosition )
-					? game.World.Env.Sunlight : game.World.Env.Shadowlight;
+				
+				int X = (int)realP.EyePosition.X;
+				int Y = (int)realP.EyePosition.Y;
+				int Z = (int)realP.EyePosition.Z;
+				int light;
+				int intCol;
+				bool inBounds = game.World.IsValidPos(X, Y, Z);
+				
+				if( inBounds ) {
+					light = Map.LightVolume.lightLevels[X, Y, Z];
+					intCol = Map.LightVolume.lightmap[light >> 4, light & 0xF];
+				} else {
+					intCol = Map.LightVolume.lightmap[7, 0];
+				}
+				
+				col = new FastColour(intCol);
+				//col = game.World.IsLit( realP.EyePosition )
+				//	? game.World.Env.Sunlight : game.World.Env.Shadowlight;
 				
 				// Adjust pitch so angle when looking straight down is 0.
 				float adjPitch = realP.PitchDegrees - 90;

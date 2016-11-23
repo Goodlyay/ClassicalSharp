@@ -323,14 +323,28 @@ namespace ClassicalSharp {
 		
 		int AverageColorsTop( int X, int Y, int Z, int dX, int dZ) {
 			if (fullBright) return FastColour.WhitePacked;
-			FastColour col1 = new FastColour(GetBlockColorTop(X, Y, Z));
-			FastColour col2 = new FastColour(GetBlockColorTop(X+dX, Y, Z));
-			FastColour col3 = new FastColour(GetBlockColorTop(X, Y, Z+dZ));
-			FastColour col4 = new FastColour(GetBlockColorTop(X+dX, Y, Z+dZ));
+			bool useDiagonal = true;
+			bool block1;
+			bool block2;
+			bool dummy;
+			int R;
+			int G;
+			int B;
+			FastColour col1 = new FastColour(GetBlockColorTop(X, Y, Z, out dummy));
+			FastColour col2 = new FastColour(GetBlockColorTop(X+dX, Y, Z, out block1));
+			FastColour col3 = new FastColour(GetBlockColorTop(X, Y, Z+dZ, out block2));
+			FastColour col4 = new FastColour(GetBlockColorTop(X+dX, Y, Z+dZ, out dummy));
 			
-			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
-			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
-			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			useDiagonal = !(block1 && block2);
+			if( useDiagonal ) {
+				R = (col1.R + col2.R + col3.R + col4.R) / 4;
+				G = (col1.G + col2.G + col3.G + col4.G) / 4;
+				B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			} else {
+				R = (col1.R + col2.R + col3.R) / 3;
+				G = (col1.G + col2.G + col3.G) / 3;
+				B = (col1.B + col2.B + col3.B) / 3;
+			}
 			
 			#if !USE_DX
 			return 255 << 24 | B << 16 | G << 8 | R;
@@ -338,10 +352,11 @@ namespace ClassicalSharp {
 			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
-		int GetBlockColorTop( int X, int Y, int Z ) {
+		int GetBlockColorTop( int X, int Y, int Z, out bool blocksLight ) {
+			blocksLight = false;
 			if( map.IsValidPos(X, Y, Z) ) {
 				int light = LightVolume.lightLevels[X, Y, Z];
-				
+				if( info.BlocksLight[map.GetBlock(X, Y, Z)] ) { blocksLight = true; }
 				return LightVolume.lightmap[light >> 4, light & 0xF];
 			}
 			return LightVolume.lightmap[LightVolume.maxLight, 0];
@@ -350,14 +365,28 @@ namespace ClassicalSharp {
 		
 		int AverageColorsBottom( int X, int Y, int Z, int dX, int dZ) {
 			if (fullBright) return FastColour.WhitePacked;
-			FastColour col1 = new FastColour(GetBlockColorBottom(X, Y, Z));
-			FastColour col2 = new FastColour(GetBlockColorBottom(X+dX, Y, Z));
-			FastColour col3 = new FastColour(GetBlockColorBottom(X, Y, Z+dZ));
-			FastColour col4 = new FastColour(GetBlockColorBottom(X+dX, Y, Z+dZ));
+			bool useDiagonal = true;
+			bool block1;
+			bool block2;
+			bool dummy;
+			int R;
+			int G;
+			int B;
+			FastColour col1 = new FastColour(GetBlockColorBottom(X, Y, Z, out dummy));
+			FastColour col2 = new FastColour(GetBlockColorBottom(X+dX, Y, Z, out block1));
+			FastColour col3 = new FastColour(GetBlockColorBottom(X, Y, Z+dZ, out block2));
+			FastColour col4 = new FastColour(GetBlockColorBottom(X+dX, Y, Z+dZ, out dummy));
 			
-			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
-			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
-			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			useDiagonal = !(block1 && block2);
+			if( useDiagonal ) {
+				R = (col1.R + col2.R + col3.R + col4.R) / 4;
+				G = (col1.G + col2.G + col3.G + col4.G) / 4;
+				B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			} else {
+				R = (col1.R + col2.R + col3.R) / 3;
+				G = (col1.G + col2.G + col3.G) / 3;
+				B = (col1.B + col2.B + col3.B) / 3;
+			}
 			
 			#if !USE_DX
 			return 255 << 24 | B << 16 | G << 8 | R;
@@ -365,10 +394,11 @@ namespace ClassicalSharp {
 			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
-		int GetBlockColorBottom( int X, int Y, int Z ) {
+		int GetBlockColorBottom( int X, int Y, int Z, out bool blocksLight ) {
+			blocksLight = false;
 			if( map.IsValidPos(X, Y, Z) ) {
 				int light = LightVolume.lightLevels[X, Y, Z];
-				
+				if( info.BlocksLight[map.GetBlock(X, Y, Z)] ) { blocksLight = true; }
 				return LightVolume.lightmapYBottom[light >> 4, light & 0xF];
 			}
 			return LightVolume.lightmapYBottom[LightVolume.maxLight, 0];
@@ -377,14 +407,28 @@ namespace ClassicalSharp {
 		
 		int AverageColorsZSide( int X, int Y, int Z, int dX, int dY) {
 			if (fullBright) return FastColour.WhitePacked;
-			FastColour col1 = new FastColour(GetBlockColorZSide(X, Y, Z));
-			FastColour col2 = new FastColour(GetBlockColorZSide(X+dX, Y, Z));
-			FastColour col3 = new FastColour(GetBlockColorZSide(X, Y+dY, Z));
-			FastColour col4 = new FastColour(GetBlockColorZSide(X+dX, Y+dY, Z));
+			bool useDiagonal = true;
+			bool block1;
+			bool block2;
+			bool dummy;
+			int R;
+			int G;
+			int B;
+			FastColour col1 = new FastColour(GetBlockColorZSide(X, Y, Z, out dummy));
+			FastColour col2 = new FastColour(GetBlockColorZSide(X+dX, Y, Z, out block1));
+			FastColour col3 = new FastColour(GetBlockColorZSide(X, Y+dY, Z, out block2));
+			FastColour col4 = new FastColour(GetBlockColorZSide(X+dX, Y+dY, Z, out dummy));
 			
-			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
-			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
-			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			useDiagonal = !(block1 && block2);
+			if( useDiagonal ) {
+				R = (col1.R + col2.R + col3.R + col4.R) / 4;
+				G = (col1.G + col2.G + col3.G + col4.G) / 4;
+				B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			} else {
+				R = (col1.R + col2.R + col3.R) / 3;
+				G = (col1.G + col2.G + col3.G) / 3;
+				B = (col1.B + col2.B + col3.B) / 3;
+			}
 			
 			#if !USE_DX
 			return 255 << 24 | B << 16 | G << 8 | R;
@@ -392,10 +436,11 @@ namespace ClassicalSharp {
 			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
-		int GetBlockColorZSide( int X, int Y, int Z ) {
+		int GetBlockColorZSide( int X, int Y, int Z, out bool blocksLight ) {
+			blocksLight = false;
 			if( map.IsValidPos(X, Y, Z) ) {
 				int light = LightVolume.lightLevels[X, Y, Z];
-				
+				if( info.BlocksLight[map.GetBlock(X, Y, Z)] ) { blocksLight = true; }
 				return LightVolume.lightmapZSide[light >> 4, light & 0xF];
 			}
 			return LightVolume.lightmapZSide[LightVolume.maxLight, 0];
@@ -404,14 +449,28 @@ namespace ClassicalSharp {
 		
 		int AverageColorsXSide( int X, int Y, int Z, int dZ, int dY) {
 			if (fullBright) return FastColour.WhitePacked;
-			FastColour col1 = new FastColour(GetBlockColorXSide(X, Y, Z));
-			FastColour col2 = new FastColour(GetBlockColorXSide(X, Y, Z+dZ));
-			FastColour col3 = new FastColour(GetBlockColorXSide(X, Y+dY, Z));
-			FastColour col4 = new FastColour(GetBlockColorXSide(X, Y+dY, Z+dZ));
+			bool useDiagonal = true;
+			bool block1;
+			bool block2;
+			bool dummy;
+			int R;
+			int G;
+			int B;
+			FastColour col1 = new FastColour(GetBlockColorXSide(X, Y, Z, out dummy));
+			FastColour col2 = new FastColour(GetBlockColorXSide(X, Y, Z+dZ, out block1));
+			FastColour col3 = new FastColour(GetBlockColorXSide(X, Y+dY, Z, out block2));
+			FastColour col4 = new FastColour(GetBlockColorXSide(X, Y+dY, Z+dZ, out dummy));
 			
-			int R = (col1.R + col2.R + col3.R + col4.R) / 4;
-			int G = (col1.G + col2.G + col3.G + col4.G) / 4;
-			int B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			useDiagonal = !(block1 && block2);
+			if( useDiagonal ) {
+				R = (col1.R + col2.R + col3.R + col4.R) / 4;
+				G = (col1.G + col2.G + col3.G + col4.G) / 4;
+				B = (col1.B + col2.B + col3.B + col4.B) / 4;
+			} else {
+				R = (col1.R + col2.R + col3.R) / 3;
+				G = (col1.G + col2.G + col3.G) / 3;
+				B = (col1.B + col2.B + col3.B) / 3;
+			}
 			
 			#if !USE_DX
 			return 255 << 24 | B << 16 | G << 8 | R;
@@ -419,10 +478,11 @@ namespace ClassicalSharp {
 			return 255 << 24 | R << 16 | G << 8 | B;
 			#endif
 		}
-		int GetBlockColorXSide( int X, int Y, int Z ) {
+		int GetBlockColorXSide( int X, int Y, int Z, out bool blocksLight ) {
+			blocksLight = false;
 			if( map.IsValidPos(X, Y, Z) ) {
 				int light = LightVolume.lightLevels[X, Y, Z];
-				
+				if( info.BlocksLight[map.GetBlock(X, Y, Z)] ) { blocksLight = true; }
 				return LightVolume.lightmapXSide[light >> 4, light & 0xF];
 			}
 			return LightVolume.lightmapXSide[LightVolume.maxLight, 0];
