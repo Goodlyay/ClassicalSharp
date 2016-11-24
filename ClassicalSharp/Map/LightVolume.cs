@@ -43,18 +43,41 @@ namespace ClassicalSharp.Map {
 			}
 		}
 		
-		void UpdateLightmap() {		
-			for (int y = 0; y < lightExtent; y++)
+		
+		void UpdateLightmap() {
+			FastColour darkShadow = env.Shadowlight;
+			FastColour torchLight = new FastColour(249, 218, 185, 255);
+			darkShadow.R >>= 3;
+			darkShadow.G >>= 3;
+			darkShadow.B >>= 3;
+			FastColour halfSun = FastColour.Lerp(env.Shadowlight, env.Sunlight, 0.5f);
+			FastColour torchSun = new FastColour(Math.Max(torchLight.R, env.Sunlight.R), Math.Max(torchLight.G, env.Sunlight.G), Math.Max(torchLight.B, env.Sunlight.B));
+			for (int y = 0; y < lightExtent; y++) {
+				
+				float lerpY = y / (float)(lightExtent - 1);
+				lerpY = 1.0f -(float)Math.Cos(lerpY *Math.PI * 0.5f);
+				
+				FastColour lerpShadow = FastColour.Lerp(darkShadow, torchLight, lerpY);
+				FastColour lerpHalfLight = FastColour.Lerp(halfSun, torchLight, lerpY);
+				FastColour lerpLight = FastColour.Lerp(env.Sunlight, torchLight, lerpY);
+					
 				for (int x = 0; x < lightExtent; x++)
-			{
-				float t = Math.Max(x, y) / (float)(lightExtent - 1);
-				FastColour col = FastColour.Lerp(env.Shadowlight, env.Sunlight, t);
-				SetLightmap(x, y, col);
+				{
+					//1 -cos
+					float lerpX = x / (float)(lightExtent - 1);
+					lerpX = 1.0f -(float)Math.Cos(lerpX *Math.PI * 0.5f);
+					
+					FastColour col = FastColour.Lerp(lerpShadow, lerpHalfLight, lerpX);
+					
+					
+					SetLightmap(x, y, col);
+				}
+				SetLightmap(15, y, lerpLight);
 			}
 		}
 
 		void TextureChanged(object sender, TextureEventArgs e) {
-			return; //because I'm trying to test using only the env colors
+			//return; //because I'm trying to test using only the env colors
 			if (e.Name != "lightmap.png") return;
 			
 			using (MemoryStream ms = new MemoryStream(e.Data))
@@ -72,6 +95,7 @@ namespace ClassicalSharp.Map {
 					SetLightmap(x, y, new FastColour(col));
 				}
 			}
+			game.MapRenderer.Refresh();
 		}
 		
 		static void SetLightmap(int x, int y, FastColour col) {
