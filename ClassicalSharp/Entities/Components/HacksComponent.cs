@@ -75,6 +75,7 @@ namespace ClassicalSharp.Entities {
 		/// <summary> Parses hack flags specified in the motd and/or name of the server. </summary>
 		/// <remarks> Recognises +/-hax, +/-fly, +/-noclip, +/-speed, +/-respawn, +/-ophax, and horspeed=xyz </remarks>
 		public void ParseHackFlags( string name, string motd ) {
+			return;
 			string joined = name + motd;
 			SetAllHacks( true );
 			MaxSpeedMultiplier = 1;

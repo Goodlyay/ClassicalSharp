@@ -33,37 +33,25 @@ namespace ClassicalSharp.Map {
 			lightmapXSide = new int[lightExtent, lightExtent];
 			lightmapZSide = new int[lightExtent, lightExtent];
 			lightmapYBottom = new int[lightExtent, lightExtent];
-			
-			//int defaultSun = unchecked((int)0xFFFFFFFF);
-			//int defaultShadow = unchecked((int)0xFF9B9B9B);
-			
-			FastColour sunlight;// = new FastColour(defaultSun);
-			FastColour shadowlight;// = new FastColour(defaultShadow);
-			
-			//if( map.Env != null && map.Env.Sunlight != null ) {
-				sunlight = new FastColour(env.Sun);
-			//}
-			//if( map.Env != null && map.Env.Shadowlight != null ) {
-				shadowlight = new FastColour(env.Shadow);
-			//}
-			
-			int shadowSunDiffR = sunlight.R - shadowlight.R;
-			int shadowSunDiffG = sunlight.G - shadowlight.G;
-			int shadowSunDiffB = sunlight.B - shadowlight.B;
-			
-			for (int y = 0; y < lightExtent; y++)
-				for (int x = 0; x < lightExtent; x++)
-			{
-				float max = Math.Max(x, y);
-				//shadow + (sunlight - shadow) * Math.Max(x, y) / maxLight;
-				int colR = (int)(shadowlight.R + shadowSunDiffR * max / maxLight);
-				int colG = (int)(shadowlight.G + shadowSunDiffG * max / maxLight);
-				int colB = (int)(shadowlight.B + shadowSunDiffB * max / maxLight);
-				SetLightmap(x, y, new FastColour(colR, colG, colB)); 
+			UpdateLightmap();
+		}
+		
+		void EnvVariableChanged(object sender, EnvVarEventArgs e) {
+			if (e.Var == EnvVar.ShadowlightColour || e.Var == EnvVar.SunlightColour) {
+				UpdateLightmap();
+				game.MapRenderer.Refresh();
 			}
 		}
 		
-		void EnvVariableChanged(object sender, EnvVarEventArgs e) { }
+		void UpdateLightmap() {		
+			for (int y = 0; y < lightExtent; y++)
+				for (int x = 0; x < lightExtent; x++)
+			{
+				float t = Math.Max(x, y) / (float)(lightExtent - 1);
+				FastColour col = FastColour.Lerp(env.Shadowlight, env.Sunlight, t);
+				SetLightmap(x, y, col);
+			}
+		}
 
 		void TextureChanged(object sender, TextureEventArgs e) {
 			return; //because I'm trying to test using only the env colors
@@ -88,7 +76,7 @@ namespace ClassicalSharp.Map {
 		
 		static void SetLightmap(int x, int y, FastColour col) {
 			lightmap[x, y] = col.Pack();
-			FastColour.GetShaded(col, out lightmapXSide[x, y], 
+			FastColour.GetShaded(col, out lightmapXSide[x, y],
 			                     out lightmapZSide[x, y], out lightmapYBottom[x, y]);
 		}
 		
