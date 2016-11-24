@@ -11,9 +11,10 @@ namespace ClassicalSharp.Map {
 		Game game;
 		World map;
 		BlockInfo info;
+		WorldEnv env;
 		
 		int width, length, height, sidesLevel, edgeLevel;
-		public const byte lightExtent = 8;
+		public const byte lightExtent = 16;
 		public const byte maxLight = (byte)(lightExtent - 1);
 		protected int maxX, maxY, maxZ;
 		public static byte[, ,] lightLevels;
@@ -21,31 +22,58 @@ namespace ClassicalSharp.Map {
 		
 		public void Init( Game game ) {
 			this.game = game;
+			map = game.World;
+			env = game.World.Env;
 			info = game.BlockInfo;
 			game.WorldEvents.OnNewMapLoaded += OnNewMapLoaded;
 			game.Events.TextureChanged += TextureChanged;
+			game.WorldEvents.EnvVariableChanged += EnvVariableChanged;
 			
 			lightmap = new int[lightExtent, lightExtent];
 			lightmapXSide = new int[lightExtent, lightExtent];
 			lightmapZSide = new int[lightExtent, lightExtent];
 			lightmapYBottom = new int[lightExtent, lightExtent];
 			
+			//int defaultSun = unchecked((int)0xFFFFFFFF);
+			//int defaultShadow = unchecked((int)0xFF9B9B9B);
+			
+			FastColour sunlight;// = new FastColour(defaultSun);
+			FastColour shadowlight;// = new FastColour(defaultShadow);
+			
+			//if( map.Env != null && map.Env.Sunlight != null ) {
+				sunlight = new FastColour(env.Sun);
+			//}
+			//if( map.Env != null && map.Env.Shadowlight != null ) {
+				shadowlight = new FastColour(env.Shadow);
+			//}
+			
+			int shadowSunDiffR = sunlight.R - shadowlight.R;
+			int shadowSunDiffG = sunlight.G - shadowlight.G;
+			int shadowSunDiffB = sunlight.B - shadowlight.B;
+			
 			for (int y = 0; y < lightExtent; y++)
 				for (int x = 0; x < lightExtent; x++)
 			{
-				int col = Math.Max(x, y) * 255 / maxLight;
-				SetLightmap(x, y, new FastColour(col, col, col));
+				float max = Math.Max(x, y);
+				//shadow + (sunlight - shadow) * Math.Max(x, y) / maxLight;
+				int colR = (int)(shadowlight.R + shadowSunDiffR * max / maxLight);
+				int colG = (int)(shadowlight.G + shadowSunDiffG * max / maxLight);
+				int colB = (int)(shadowlight.B + shadowSunDiffB * max / maxLight);
+				SetLightmap(x, y, new FastColour(colR, colG, colB)); 
 			}
 		}
+		
+		void EnvVariableChanged(object sender, EnvVarEventArgs e) { }
 
 		void TextureChanged(object sender, TextureEventArgs e) {
+			return; //because I'm trying to test using only the env colors
 			if (e.Name != "lightmap.png") return;
 			
 			using (MemoryStream ms = new MemoryStream(e.Data))
 				using (Bitmap bmp = Platform.ReadBmp(ms))
 			{
 				if (bmp.Width != lightExtent || bmp.Height != lightExtent) {
-					game.Chat.Add("&clightmap.png must be 8x8"); return;
+					game.Chat.Add("&clightmap.png must be " + lightExtent + "x" + lightExtent + "."); return;
 				}
 				
 				// Not bothering with FastBitmap here as perf increase is insignificant.
